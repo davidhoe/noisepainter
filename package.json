@@ -1,0 +1,86 @@
+{
+  "jspm": {
+    "directories": {
+      "baseURL": "src",
+      "doc": "docs",
+      "packages": "src/lib",
+      "test": "test"
+    },
+    "dependencies": {
+      "jquery": "npm:jquery@^3.1.1",
+      "three": "github:mrdoob/three.js@master"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4"
+    },
+    "buildConfig": {
+      "transpileES6": false,
+      "minify": true
+    }
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test",
+    "baseURL": "src",
+    "packages": "src/lib"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.22.0",
+    "ftpsync": "^0.1.10",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-cached": "^1.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-connect": "^2.3.1",
+    "gulp-cssnano": "^2.1.1",
+    "gulp-eslint": "^1.1.1",
+    "gulp-htmlmin": "^1.3.0",
+    "gulp-imagemin": "^2.4.0",
+    "gulp-jsdoc3": "^1.0.1",
+    "gulp-jspm": "^0.5.6",
+    "gulp-open": "^2.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-sass": "^2.2.0",
+    "gulp-sass-lint": "^1.1.1",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.2",
+    "gulp-util": "^3.0.7",
+    "imagemin-pngquant": "^4.2.0",
+    "jspm": "^0.16.52",
+    "karma": "^1.4.1",
+    "karma-chrome-launcher": "^2.0.0",
+    "require-dir": "^0.3.1",
+    "run-sequence": "^1.1.5",
+    "sassdoc": "^2.1.20",
+    "three": "^0.84.0"
+  },
+  "name": "pattern",
+  "description": "",
+  "version": "1.0.0",
+  "main": "main.js",
+  "dependencies": {},
+  "scripts": {
+    "install": "jspm install",
+    "makedir": "if not exist build mkdir build",
+    "bundle": "jspm bundle main.js",
+    "copybundle": "copy build.js build\\build.js",
+    "copyhtml": "copy index.html build\\index.html",
+    "copyconfig": "copy config.js build\\config.js",
+    "copycss": "xcopy css\\*.* build\\css\\*.* /e/y",
+    "copysystemjs": "copy jspm_packages\\system.js build\\system.js",
+    "build": "npm run bundle && npm run makedir && npm run copybundle && npm run copysystemjs && npm run copyconfig && npm run copycss"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidhoe/pattern.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/davidhoe/pattern/issues"
+  },
+  "homepage": "https://github.com/davidhoe/pattern#readme"
+}
