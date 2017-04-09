@@ -82,11 +82,12 @@ function init() {
         return;
     }
 
-    renderer.setClearColor( 0x000000 );
+    renderer.setClearColor( 0xFFFFFF );
     renderer.autoClear = false;
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
+    renderer.clear();
 
 /*
     stats = new Stats();
@@ -241,12 +242,13 @@ function drawTest()
     var nx =  Math.random()*0.99;
     var ny = Math.random()*0.99;
     var col = getPixel(imagedata,nx,ny);
-    var x =-500+ nx*1000;
-    var y =-500+ ny*1000;
+    var x =-1000+ nx*2000;
+    var y =-450+ ny*950;
 
     var thickness = 2 + Math.random()*4;
     var particle = new Particle(field);
-    particle.init(x,y, thickness);
+    var direction = (Math.random() < 0.5)?  -1 : 1;
+    particle.init(x,y, thickness, direction);
     particle.strokePath.colour = new THREE.Vector3(col.r,col.g,col.b);
     var nsteps = 5 + Math.random()*10;
     for(var i =0; i< nsteps;++i)
@@ -298,7 +300,7 @@ function animate() {
         bufferix = 0;
        // console.log("imageDataLoaded", imageDataLoaded);
 
-        for (var i = 0; i < 100; ++i) {
+        for (var i = 0; i < 500; ++i) {
             drawTest();
         }
         // update

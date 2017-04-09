@@ -8,10 +8,12 @@ export class Particle
         this.field = field;
         this.p = {'x':0, 'y':0};
         this.v = {'x':0, 'y':0};
+        this.direction = 1;
     }
 
-    init(x,y, thickness = 5)
+    init(x,y, thickness = 5, direction = 1)
     {
+        this.direction = direction;
         this.p.x = x;
         this.p.y = y;
         this.strokePath = new StrokePath();
@@ -26,8 +28,8 @@ export class Particle
         this.v.y = fv.y;
 
         var speed = 5 + Math.random()*10;
-        this.p.x += this.v.x*speed;
-        this.p.y += this.v.y*speed ;
+        this.p.x += this.v.x*speed*this.direction;
+        this.p.y += this.v.y*speed*this.direction ;
         this.strokePath.addPoint(new THREE.Vector3(this.p.x,this.p.y), thickness);
     }
 }
