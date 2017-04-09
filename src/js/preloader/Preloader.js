@@ -17,6 +17,7 @@ export default class Preloader {
             files.forEach(function (item) {
                 loader.load(item, function () {
                     loadedFiles++;
+                    console.log("loaded ", item);
                     if (loadedFiles >= totalFiles) {
                         handler();
                     }

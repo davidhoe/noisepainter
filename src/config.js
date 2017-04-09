@@ -17,6 +17,7 @@ System.config({
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "core-js": "npm:core-js@1.2.7",
     "jquery": "npm:jquery@3.1.1",
+    "stats-js": "npm:stats-js@1.0.0-alpha1",
     "three": "github:mrdoob/three.js@master",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
