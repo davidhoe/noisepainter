@@ -41,12 +41,16 @@ function filesLoaded(files)
     makeMeshObj();
 }
 
-
+var w,h;
 function init() {
 
     container = document.getElementById( 'container' );
 
-    camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 500 );
+    //var w = window.innerWidth;
+    //var h = window.innerHeight;
+    w = 6000;
+    h = 6000;
+    camera = new THREE.OrthographicCamera( w / - 2, w / 2, h / 2, h / - 2, - 500, 500 );
 
 //    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
     //camera.position.z = 20;
@@ -87,7 +91,7 @@ function init() {
     renderer.setClearColor( 0xFFFFFF );
     renderer.autoClear = false;
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( w,h);
     document.body.appendChild( renderer.domElement );
     renderer.clear();
 
@@ -103,8 +107,27 @@ function init() {
 document.addEventListener('keydown',onDocumentKeyDown,false);
 function onDocumentKeyDown(event) {
     console.log(event);
-    saveAsImage();
+    if(event.key == 's') {
+        //saveAsImage();
+      //  savePixels();
+         saveCanvas();
+    }
+}
 
+function savePixels()
+{
+    var gl = renderer.domElement.getContext('webgl');
+    console.log(gl.drawingBufferWidth, gl.drawingBufferHeight);
+    var pixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4);
+    gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    console.log(pixels); // Uint8Array
+}
+
+function saveCanvas()
+{
+    renderer.domElement.toBlob(function(blob) {
+        saveAs(blob, "output.png");
+    });
 }
 
 function saveAsImage() {
@@ -112,10 +135,12 @@ function saveAsImage() {
     try {
         var strDownloadMime = "image/octet-stream";
 
-        var strMime = "image/jpeg";
+        var strMime = "image/png";
         imgData = renderer.domElement.toDataURL(strMime);
 
-        saveFile(imgData.replace(strMime, strDownloadMime), "test.jpg");
+        document.write("<img src='"+imgData+"' alt='from canvas'/>");
+
+        //saveFile(imgData.replace(strMime, strDownloadMime), "test.jpg");
     } catch (e) {
         console.log(e);
         return;
@@ -273,7 +298,7 @@ function makeMeshObj()
 
     var mesh = new THREE.Mesh( grid.geometry, material );
     mesh.frustumCulled = false;
-    var zoom = 1;
+    var zoom = 4;
     mesh.position.x = 500;
     mesh.scale.set(zoom,zoom,zoom);
     scene.add( mesh );
@@ -347,20 +372,14 @@ function drawTest()
 
 function onWindowResize( event ) {
 
-    // camera.aspect = window.innerWidth / window.innerHeight;
-
+    /*
     camera.left = window.innerWidth / - 2;
     camera.right = window.innerWidth / 2;
     camera.top = window.innerHeight / 2;
     camera.bottom = window.innerHeight / - 2;
-
-
     camera.updateProjectionMatrix();
-
-    //controls.handleResize();
-
     renderer.setSize( window.innerWidth, window.innerHeight );
-
+*/
 }
 
 //
