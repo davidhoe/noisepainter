@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import {MathUtils} from '../util/MathUtils'
 
 /**
  * 2d path that is constructed with piecewise segments from a set of points
@@ -58,6 +59,12 @@ export class StrokePath
         // identify peicewise segments
         for(var i =0; i< n-2;++i)
         {
+            var segmentAlpha = this.alpha* MathUtils.GetRandomFloat(0.1,1);
+
+            //col.x = Math.random();
+           // col.y = Math.random();
+           //  /this.alpha = Math.random();
+
             var c0 = cps[i+0];
             var c1 = cps[i+1];
             var c2 = cps[i+2];
@@ -82,11 +89,11 @@ export class StrokePath
             q1s.setXY(ix, cq1.x,cq1.y);
             q2s.setXY(ix, q2.x,q2.y);
             // todo - every x step, sample colour from canvas
-            colours0.setXYZW(ix, col.x,col.y,col.z, this.alpha);
-            colours1.setXYZW(ix, col.x,col.y,col.z, this.alpha);
+            colours0.setXYZW(ix, col.x,col.y,col.z, segmentAlpha);
+            colours1.setXYZW(ix, col.x,col.y,col.z, segmentAlpha);
 
             ix += 1;
-            if(i==n-3)
+            if(i==n-3 )
             {
                 var mid = new THREE.Vector3((c2.x + cq2.x)/2, (c2.y + cq2.y)/2);
                 // add end round cap
@@ -97,8 +104,8 @@ export class StrokePath
                 q0s.setXY(ix, q2.x,q2.y);
                 q1s.setXY(ix, cq2.x,cq2.y);
                 q2s.setXY(ix, mid.x,mid.y);
-                colours0.setXYZ(ix, col.x,col.y,col.z, this.alpha);
-                colours1.setXYZ(ix, col.x,col.y,col.z, this.alpha);
+                colours0.setXYZW(ix, col.x,col.y,col.z, segmentAlpha);
+                colours1.setXYZW(ix, col.x,col.y,col.z, segmentAlpha);
                 //console.log(col.x,col.y,col.z);
 
                 ix += 1;

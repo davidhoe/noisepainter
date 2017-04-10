@@ -1,6 +1,6 @@
 import {StrokePath} from './StrokePath'
 import * as THREE from 'three'
-
+import {MathUtils} from '../util/MathUtils'
 export class Particle
 {
     constructor(field)
@@ -27,7 +27,7 @@ export class Particle
         this.v.x = fv.x;
         this.v.y = fv.y;
 
-        var speed = 5 + Math.random()*10;
+        var speed = 5 + MathUtils.GetSeededRandomFloat(0,10) ;
         speed /= 2000;
         this.p.x += this.v.x*speed*this.direction;
         this.p.y += this.v.y*speed*this.direction ;

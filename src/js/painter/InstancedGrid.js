@@ -8,7 +8,12 @@ export class InstancedGrid{
     constructor()
     {
         this.geometry = new THREE.InstancedBufferGeometry();
-        this.instances = 20000;// default
+       // this.instances = 20000;// default
+    }
+
+    setDrawCount(n)
+    {
+        this.geometry.maxInstancedCount = n;
     }
 
 

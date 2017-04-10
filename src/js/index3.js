@@ -6,7 +6,7 @@ import {StrokePath} from './painter/StrokePath'
 import {Particle} from './painter/Particle'
 import {VectorField} from './painter/VectorField'
 import Preloader from "./preloader/Preloader"
-
+import {MathUtils} from "./util/MathUtils"
 
 import * as THREE from 'three'
 import * as Stats from 'stats-js'
@@ -157,6 +157,7 @@ var basepath;
 var pathobj;
 var ready = false;
 var bufferix;
+var grid;
 
 function makeMeshObj()
 {
@@ -174,10 +175,10 @@ function makeMeshObj()
     nInstances = 100000; // max number of instances that can be render in one go
     bufferix = 0;
 
-    var grid = new InstancedGrid();
+    grid = new InstancedGrid();
     grid.print();
-    var nx = 2;
-    var nz = 10;
+    var nx = 2; // keep this as 2
+    var nz = 5; // resolution
     var zLen = 25;
     //grid.createTube(nx,nz,1,1,zLen);
     //grid.createRectTube(7,5,100,40);
@@ -225,14 +226,14 @@ function makeMeshObj()
         fragmentShader: fragshader,
         //side: THREE.DoubleSide,
         transparent: true,
-        //   wireframe: true
+         //  wireframe: true
 
     } );
 
     var mesh = new THREE.Mesh( grid.geometry, material );
     mesh.frustumCulled = false;
     var zoom = 2;
-    mesh.position.x = 1000;
+    mesh.position.x = 500;
     mesh.scale.set(zoom,zoom,zoom);
     scene.add( mesh );
 
@@ -250,18 +251,43 @@ function drawTest()
     //var y =-450+ ny*950;
 
 
-    var thickness = 2 + Math.random()*4;
-    var particle = new Particle(field);
+    var thickness = 0.5 + Math.random()*4;
     var direction = (Math.random() < 0.5)?  -1 : 1;
+    var nsteps = 5 + Math.random()*10;
+    var alpha =  0.7 + 0.5*Math.random();
+    var particle;
+
+    // set a random seed
+    var seed = MathUtils.GetRandomIntBetween(0,100000);
+
+    // draw the shading (alpha black)
+    var brightness = 0.5;
+    MathUtils.SetSeed(seed); // rset seed
+    particle = new Particle(field);
+    var thicknessShade = Math.min( thickness  + 4, thickness  *1.2);
+    particle.init( nx,ny, thicknessShade, direction);
+    particle.strokePath.colour = new THREE.Vector3(col.r*brightness,col.g*brightness,col.b*brightness);
+    particle.strokePath.alpha = alpha*0.2;
+    for(var i =0; i< nsteps;++i)
+    {
+        particle.update(thicknessShade);
+    }
+    bufferix = particle.strokePath.constructPath(p0s,p1s,p2s,q0s,q1s,q2s,colours0,colours1,bufferix);
+
+
+
+    // draw the colour
+    MathUtils.SetSeed(seed); // rset seed
+    particle = new Particle(field);
     particle.init(nx,ny, thickness, direction);
     particle.strokePath.colour = new THREE.Vector3(col.r,col.g,col.b);
-    particle.strokePath.alpha = 0.2 + 0.5*Math.random();
-    var nsteps = 5 + Math.random()*10;
+    particle.strokePath.alpha =alpha;
     for(var i =0; i< nsteps;++i)
     {
         particle.update(thickness);
     }
     bufferix = particle.strokePath.constructPath(p0s,p1s,p2s,q0s,q1s,q2s,colours0,colours1,bufferix);
+
 
     /*
      // test a couple of curves
@@ -309,6 +335,8 @@ function animate() {
         for (var i = 0; i < 500; ++i) {
             drawTest();
         }
+        grid.setDrawCount(bufferix);
+
         // update
         p0s.needsUpdate = true;
         p1s.needsUpdate = true;
