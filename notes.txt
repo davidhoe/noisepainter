@@ -1,225 +1,50 @@
-notes
+todo
 
-frame 240,157,500 w,675 h
+add an alpha att
+test colour change - sample along the particle path and adjust colour?
 
-nice colour sets
-368,476
+scaling
+render to texture as an option then render this to screen.
 
+test what the largest render texture is - 5000 wide - ideal
 
-phase 1:
-
-
-wallpaper generator
-
-colour select
-pattern select
-save to file
-
-fullscreen background
-pattern select on the left
-
-phase 2:
-
-To test - nodes:
-
-DecisionNode - choose one of x children to execute, public index.
-RepeatNode  - repeat execution of children n times, public n
-PathNode - set a path. public path (for custom paths )
-PointParam - getVlaue() returns a paper.point. public point
-QuadtoTri - should take in an interpolated point set, defaulting at 0,0 1,1 0,1
- SaveParamNode - public getValue(), setParam(int i)
-QuadToQuarterCircleNode
-QuadToDiagonalLeafNode
-
-PointUtil.createNormalisedQuarterCircle();
-PointUtil.createNormalisedTri();
-PointUtil.CreateNormalisedDiagonalLeaf();
-PointUtil.transformToQuadSpace(normalisedSegments, quad);
-QuadToShapeNode(normalisedSegments)
-PointUtil.createNormalisedOval();
-PointUtil.createNormalisedSCurveShape();
-QuadToOvalNOde
-QuadToSCurveNode
-QuadShear - extend line1 in one direction, line2 in another direction
-QuadMirrorNode
-add matrix to the state, apply this to the fillnode
-TransformNode
-center transform from current shape?
-quadnode
-TranslateGrid
-pointutil.CreatePointQuadGrid - ergualr spaced
-add group to pattern state, inital null
-GroupNode  - public clipping Masking
-node  methods - save/restore state group
-Blendmode, opacity
-CompoundPath - http://paperjs.org/reference/compoundpath/#compoundpath-object
-node.setHead()
-node = new Node() -> auto adds to the head
-node.removeFromParent();
-gradient
-create radial points
-Param save - save to map?
-ParamSaveNode - id string, input colourset.  Output-  nothing
-GetSavedParam - id string, output
-line node - this is a rect from line points
-GradientNode - c0,c1,
-NodelistUI - adda filter search textfield to the top. use jquery hide/show
-stroke node
-LineFromPointsNode - p0,p1, thickness
-LineNode , length, thickness, angle, anchrpoint
-TriNode, w,h,anchorpoint ,agnle?
-CircleNode , w,h (centered)
-
-TriangleFromCircle, a0,a1,a2, r
-LineFromCircle, a0,a1, r
-QuadToTranslation, np = new paper.Point(0.5,0.5)
-add canvas w,h to the json export?
-node tree should be relative to the canvas dimension (0,0),
-test exporting a svg
-test the effect of a transform scale on the stroke width
+get pixels from render target
+http://stackoverflow.com/questions/18167797/three-js-retrieve-data-from-webglrendertarget-water-sim
 
 
-Todo- nodes:
-
-// renderSVG
-create offscreen project with canvas (renderw,h) = canvas w,h
-draw node tree to layer
-export - done
-
-add a canvas w,h? make this adjustable via 2 textbxoes in the canvasEditorUI.
-
-ImageParam -  for a raster (input string filename)
-GetColourFromImage - input: raster,position Point   output: colour
-Node to get current position in local space (factor in state matrix), output: position, normalised
 
 
-save/load
-add a select field
---json file array of the nodes []
-read in and populate a select field?
-on change - load in the correct file
-default one is the first one
-Savename field, save button
 
-test exporting a high res output png
+// @author Omar Shehata. 2016.
+// We are loading the Three.js library from the CDN here:
+// http://cdnjs.com/libraries/three.js/
 
-copy and paste?
+//// This is the basic scene setup ////
 
-TextureClipGroupNode? - node that includes a group and clips the texture with the current states path?
-TexturePresetNode - set textureIX
+var scene = new THREE.Scene();
+var width, height = window.innerWidth, window.innerHeight;
+var camera = new THREE.PerspectiveCamera( 70, width/height, 1, 1000 );
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( width,height);
+document.body.appendChild( renderer.domElement );
 
-colour array - input is a set of individual points?
-colour params
+//// This is where we create our off-screen render target ////
 
-Create more than one childnode output?
-IfThenNode (if bool is true, then process IfNode else process Then)
-CompareFloatParam ( operator ""==", ">=". "<=", "<", ">", "!="  , x0, x1)
+// Create a different scene to hold our buffer objects
+var bufferScene = new THREE.Scene();
+// Create the texture that will store our result
+var bufferTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
 
-basenodeview - 102
-add a param
+////
+// Add anything you want to render/capture in bufferScene here //
+////
 
-test a pattern nodeview with an output?
--apply this for:
-* repeatnode (ix)
-* saveparamnode - test
-* anything with a for loop inside?
-
-
-param nodes:
-Colourset - public int (ix), output: colourarray, (int) n?
-RandomColourset - output: colourarray, (int) n?
-
-ArrayCreate - single colours into an array input: X colour slots, output 1 colour slot.
-ArrayInterlaceSplit - 1 array, mode (odd,even) , 1 array?
-ArrayCombine -input 2 arrays, output array
-
-change to multiple outputs -
-have an array of outputs?
-outputs[]
-getOutput()
-{
+function render() {
+    requestAnimationFrame( render );
+    // Render onto our off-screen texture
+    renderer.render(bufferScene, camera, bufferTexture);
+    // Finally, draw to the screen
+    renderer.render( scene, camera );
 }
-get the definitions from the output values?
-paramDef
-array of outputs
 
-
-ParamView - simple
-Delete A connection
-HTMLNodeList - callback on clicked with the data constructor name)
-
-
----------------
-- open params menu
-- click on a node to show params - focus
-
-- test 2 different canvases
-
-- nodeview  - make a connectorStartDragTarget , palce at the bottom
-- make a connectorDrag tool - pass inthe connector ref
---tool - attach to (node, param) node events (enter,leave)
-- on leave - stop highlight, on enter start highlight
-- on tool up - if over node then attac
-- connector follows mouse
-- line connection between 2 nodes
-
-do a cyclic check for a new connection line.
-
-- on node select - show Options (delete, params div)
-- on node deselect - hide Options
-
-Node UI tree
-- node Defintion - label, type?
-- create a param Defintion list
- - param has name, label, Type (float,int,colour, colourset), range?
-
-save /restore node
-save / restore whole tree
-
-- drag and drop node UI
-- set a heading from the defintion
-- generate param list
-
-------------
-
-OperatorFilterNode -  public value0, value1, operator eum (equals, less more, not equals)
-
-TextureNode(filename)  Raster
-TextureUtils - texture loading
-
-Gradient
-
-test view/project/paper scope
-
-pointutil.createPointTriGrid
-
-change rectgridutils, tri gridutils to use the quad path instead of the bound
-remove the bound from the pattern state
-
-Tri to sub tri node
-Tri to sub Quad node
-
-stroke style  http://paperjs.org/reference/shape/
-
-
-PointPathParam - getValue() return path. for custom paths like drawing out a branch
-               - has a set of PointParam children
-
-TranslationPointParam - get the value of the translation from the current matrix state
-
-ShapePathNode extends PathNode - set a regular shape like circle,line, star..
-   - centered, anchorpoint?
-
-
-
-
-----------------
-
-milestone goals
-simple wallpaer creator - a few pattern modes,
-change the mode
-change the colour
-next (randomise)
-back
-
-
+render(); // Render everything!

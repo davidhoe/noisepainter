@@ -22,10 +22,10 @@ var container, stats;
 var controls;
 
 var camera, scene, renderer;
-var orientations;
-var offsets;
-var lengths;
-var speeds;
+//var orientations;
+//var offsets;
+//var lengths;
+//var speeds;
 
 
 var fragshader;
@@ -194,8 +194,8 @@ function makeMeshObj()
     q0s = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 3 ), 3, 1 ).setDynamic( true);
     q1s = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 3 ), 3, 1 ).setDynamic( true);
     q2s = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 3 ), 3, 1 ).setDynamic( true);
-    colours0 = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 3 ), 3, 1 ).setDynamic( true);
-    colours1 = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 3 ), 3, 1 ).setDynamic( true);
+    colours0 = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 4 ), 4, 1 ).setDynamic( true);
+    colours1 = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 4 ), 4, 1 ).setDynamic( true);
 
     // remove this
     // startRs = new THREE.InstancedBufferAttribute( new Float32Array( nInstances * 1 ), 1, 1 ).setDynamic( true);
@@ -231,6 +231,9 @@ function makeMeshObj()
 
     var mesh = new THREE.Mesh( grid.geometry, material );
     mesh.frustumCulled = false;
+    var zoom = 2;
+    mesh.position.x = 1000;
+    mesh.scale.set(zoom,zoom,zoom);
     scene.add( mesh );
 
     ready = true;
@@ -242,14 +245,17 @@ function drawTest()
     var nx =  Math.random()*0.99;
     var ny = Math.random()*0.99;
     var col = getPixel(imagedata,nx,ny);
-    var x =-1000+ nx*2000;
-    var y =-450+ ny*950;
+
+    //var x =-1000+ nx*2000;
+    //var y =-450+ ny*950;
+
 
     var thickness = 2 + Math.random()*4;
     var particle = new Particle(field);
     var direction = (Math.random() < 0.5)?  -1 : 1;
-    particle.init(x,y, thickness, direction);
+    particle.init(nx,ny, thickness, direction);
     particle.strokePath.colour = new THREE.Vector3(col.r,col.g,col.b);
+    particle.strokePath.alpha = 0.2 + 0.5*Math.random();
     var nsteps = 5 + Math.random()*10;
     for(var i =0; i< nsteps;++i)
     {

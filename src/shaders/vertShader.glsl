@@ -3,9 +3,10 @@ precision highp float;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
+// remove these
 attribute vec3 position;
 attribute vec2 uv;
-attribute vec4 orientation;
+//attribute vec4 orientation;
 
 // one side of the path
 attribute vec3 p0;
@@ -15,12 +16,12 @@ attribute vec3 p2;
 attribute vec3 q0;
 attribute vec3 q1;
 attribute vec3 q2;
-attribute vec3 colour0;
-attribute vec3 colour1;
+attribute vec4 colour0; // include the alpha
+attribute vec4 colour1; // include the alpha
 
-attribute float length; // length scale
+//attribute float length; // length scale
 
-varying vec3 vCol;
+varying vec4 vCol;
 varying vec2 vUv;
 //varying float vTime;
 varying float vCurveR;

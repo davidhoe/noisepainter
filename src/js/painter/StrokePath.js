@@ -7,13 +7,18 @@ export class StrokePath
 {
     constructor()
     {
+        this.npoints = [];
         this.points = [];
         this.thicknesses = [];
         this.colour = new THREE.Vector3(Math.random(),Math.random(),Math.random());
+        this.alpha = 1;
     }
 
-    addPoint(p, thickness)
+    addPoint(p, thickness) // change this to normalised point coords?
     {
+        p.x = -1000 + p.x* 2000;
+        p.y = -1000 + p.y* 2000;
+
         this.points.push(p);
         this.thicknesses.push(thickness);
     }
@@ -76,8 +81,9 @@ export class StrokePath
             q0s.setXY(ix, q0.x,q0.y);
             q1s.setXY(ix, cq1.x,cq1.y);
             q2s.setXY(ix, q2.x,q2.y);
-            colours0.setXYZ(ix, col.x,col.y,col.z);
-            colours1.setXYZ(ix, col.x,col.y,col.z);
+            // todo - every x step, sample colour from canvas
+            colours0.setXYZW(ix, col.x,col.y,col.z, this.alpha);
+            colours1.setXYZW(ix, col.x,col.y,col.z, this.alpha);
 
             ix += 1;
             if(i==n-3)
@@ -91,8 +97,8 @@ export class StrokePath
                 q0s.setXY(ix, q2.x,q2.y);
                 q1s.setXY(ix, cq2.x,cq2.y);
                 q2s.setXY(ix, mid.x,mid.y);
-                colours0.setXYZ(ix, col.x,col.y,col.z);
-                colours1.setXYZ(ix, col.x,col.y,col.z);
+                colours0.setXYZ(ix, col.x,col.y,col.z, this.alpha);
+                colours1.setXYZ(ix, col.x,col.y,col.z, this.alpha);
                 //console.log(col.x,col.y,col.z);
 
                 ix += 1;
