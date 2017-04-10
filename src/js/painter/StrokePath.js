@@ -34,11 +34,18 @@ export class StrokePath
         var cps = [];
         var cqs = [];
 
+        var ranNoiseY = MathUtils.GetSeededRandomFloat(0,100);
         for(var i =0; i < n;++i) {
+            // vary the thickness of the stroke
+            // noise function?
+            var frequency = 0.1; // higher the more the compressed wave effect
+            var thicknessScale = noise.perlin2(i * frequency, ranNoiseY );
+            var thickness = this.thicknesses[i]/2 * (1 + thicknessScale*1.5);
+
             var c0 = this.points[Math.max(0,i - 1)];
             var c1 = this.points[i ];
             var c2 = this.points[Math.min(n-1, i + 1)];
-            var thickness = this.thicknesses[i]/2;
+
 
             var delta = new THREE.Vector3(c2.x - c0.x,c2.y - c0.y,0);
             // normalise it
@@ -59,7 +66,9 @@ export class StrokePath
         // identify peicewise segments
         for(var i =0; i< n-2;++i)
         {
-            var segmentAlpha = this.alpha* MathUtils.GetRandomFloat(0.1,1);
+            // vary the segment alpha
+            var segmentAlpha = this.alpha* MathUtils.GetRandomFloat(0.7,1);
+
 
             //col.x = Math.random();
            // col.y = Math.random();

@@ -28,6 +28,8 @@ var camera, scene, renderer;
 //var speeds;
 
 
+
+
 var fragshader;
 var vertshader;
 TextFileLoader.Instance().loadFiles(["shaders/fragShader.glsl","shaders/vertShader.glsl"], filesLoaded);
@@ -97,6 +99,45 @@ function init() {
 */
     window.addEventListener( 'resize', onWindowResize, false );
 }
+
+document.addEventListener('keydown',onDocumentKeyDown,false);
+function onDocumentKeyDown(event) {
+    console.log(event);
+    saveAsImage();
+
+}
+
+function saveAsImage() {
+    var imgData, imgNode;
+    try {
+        var strDownloadMime = "image/octet-stream";
+
+        var strMime = "image/jpeg";
+        imgData = renderer.domElement.toDataURL(strMime);
+
+        saveFile(imgData.replace(strMime, strDownloadMime), "test.jpg");
+    } catch (e) {
+        console.log(e);
+        return;
+    }
+
+}
+
+var saveFile = function (strData, filename) {
+    var link = document.createElement('a');
+    if (typeof link.download === 'string') {
+        document.body.appendChild(link); //Firefox requires the link to be in the body
+        link.download = filename;
+        link.href = strData;
+        link.click();
+        document.body.removeChild(link); //remove the link when done
+    } else {
+        location.replace(uri);
+    }
+}
+
+////////////////////////////////////////////////
+
 
 function getImageData( image ) {
     var canvas = document.createElement( 'canvas' );
@@ -172,7 +213,7 @@ function makeMeshObj()
    // pathobj.addToScene(scene);
 
     // geometry
-    nInstances = 100000; // max number of instances that can be render in one go
+    nInstances = 200000; // max number of instances that can be render in one go
     bufferix = 0;
 
     grid = new InstancedGrid();
@@ -232,7 +273,7 @@ function makeMeshObj()
 
     var mesh = new THREE.Mesh( grid.geometry, material );
     mesh.frustumCulled = false;
-    var zoom = 2;
+    var zoom = 1;
     mesh.position.x = 500;
     mesh.scale.set(zoom,zoom,zoom);
     scene.add( mesh );
@@ -251,9 +292,9 @@ function drawTest()
     //var y =-450+ ny*950;
 
 
-    var thickness = 0.5 + Math.random()*4;
+    var thickness = 0.5 + Math.random()*7;
     var direction = (Math.random() < 0.5)?  -1 : 1;
-    var nsteps = 5 + Math.random()*10;
+    var nsteps = 30 + Math.random()*100;
     var alpha =  0.7 + 0.5*Math.random();
     var particle;
 
@@ -336,7 +377,7 @@ function animate() {
             drawTest();
         }
         grid.setDrawCount(bufferix);
-
+        //console.log(bufferix);
         // update
         p0s.needsUpdate = true;
         p1s.needsUpdate = true;
