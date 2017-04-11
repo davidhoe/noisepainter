@@ -17,8 +17,6 @@ export class StrokePath
 
     addPoint(p, thickness) // change this to normalised point coords?
     {
-        p.x = -1000 + p.x* 2000;
-        p.y = -1000 + p.y* 2000;
 
         this.points.push(p);
         this.thicknesses.push(thickness);

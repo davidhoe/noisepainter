@@ -40,22 +40,37 @@ function filesLoaded(files)
     vertshader = files[1];
     makeMeshObj();
 }
+// emit particles from a bound, bottom of the bound is the horizon line?
+// if camera is cetnered, then it should be centered in x pos
+// if camera is not centered,
 
-var w,h;
+var renderScale = 1;
+var zoom = 0.2 * renderScale ;
+var basezoom = 1; // change this to change the amount of turbulance
+var meshPositionY = 0/basezoom*zoom;
+
+var w = 1000 * renderScale;
+var h = 800 * renderScale;
+var bottomy = h * 1.0;
+
+
 function init() {
 
     container = document.getElementById( 'container' );
 
     //var w = window.innerWidth;
     //var h = window.innerHeight;
-    w = 6000;
-    h = 6000;
-    camera = new THREE.OrthographicCamera( w / - 2, w / 2, h / 2, h / - 2, - 500, 500 );
+//    w = 6000;
+//    h = 6000;
+
+    // todo uncenter the camera
+    //camera = new THREE.OrthographicCamera( w / - 2, w / 2, h / 2, h / - 2, - 500, 500 );
+    camera = new THREE.OrthographicCamera( 0, w , h , 0, - 500, 500 );
+
 
 //    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
     //camera.position.z = 20;
-    camera.position.z = 50;
-
+    //camera.position.z = 50;
 
 
 
@@ -298,19 +313,44 @@ function makeMeshObj()
 
     var mesh = new THREE.Mesh( grid.geometry, material );
     mesh.frustumCulled = false;
-    var zoom = 4;
-    mesh.position.x = 500;
-    mesh.scale.set(zoom,zoom,zoom);
+    //var zoom = 0.5;
+  //  mesh.position.y = meshPositionY;
+  //  mesh.scale.set(zoom,zoom,zoom);
     scene.add( mesh );
+
+
+    //add a test horizon line
+    addTestLine();
 
     ready = true;
   //  drawTest();
 }
 
+
+function addTestLine()
+{
+    var material = new THREE.LineBasicMaterial({
+        color: 0xff0000
+    });
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(
+        new THREE.Vector3( -1000*renderScale, 0, 0 ),
+        new THREE.Vector3( 1000*renderScale, 0, 0 )
+    );
+    var line = new THREE.Line( geometry, material );
+    scene.add( line );
+}
+
 function drawTest()
 {
-    var nx =  Math.random()*0.99;
-    var ny = Math.random()*0.99;
+    // todo use canvas coordinates
+    // particles are nomralised [0,1] -> remap to [-h,h]
+    var nx =  Math.random()*0.99 ;
+    var ny = Math.random()*0.99 ;
+    // convert to the emission bound
+    var canvasx = nx*w; // stretch the width
+    var canvasy = ny*bottomy; // do
+
     var col = getPixel(imagedata,nx,ny);
 
     //var x =-1000+ nx*2000;
@@ -331,7 +371,7 @@ function drawTest()
     MathUtils.SetSeed(seed); // rset seed
     particle = new Particle(field);
     var thicknessShade = Math.min( thickness  + 4, thickness  *1.2);
-    particle.init( nx,ny, thicknessShade, direction);
+    particle.init( canvasx,canvasy, thicknessShade, direction);
     particle.strokePath.colour = new THREE.Vector3(col.r*brightness,col.g*brightness,col.b*brightness);
     particle.strokePath.alpha = alpha*0.2;
     for(var i =0; i< nsteps;++i)
@@ -345,7 +385,7 @@ function drawTest()
     // draw the colour
     MathUtils.SetSeed(seed); // rset seed
     particle = new Particle(field);
-    particle.init(nx,ny, thickness, direction);
+    particle.init(canvasx,canvasy, thickness, direction);
     particle.strokePath.colour = new THREE.Vector3(col.r,col.g,col.b);
     particle.strokePath.alpha =alpha;
     for(var i =0; i< nsteps;++i)

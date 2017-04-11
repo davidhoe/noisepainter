@@ -23,12 +23,12 @@ export class Particle
 
     update(thickness = 5)
     {
-        var fv = this.field.getVector(this.p.x,this.p.y  );
+        var fv = this.field.getVector(this.p.x/ 2000,this.p.y/ 2000  );
         this.v.x = fv.x;
         this.v.y = fv.y;
 
         var speed = 5 + MathUtils.GetSeededRandomFloat(0,10) ;
-        speed /= 2000;
+        speed /= 1;
         this.p.x += this.v.x*speed*this.direction;
         this.p.y += this.v.y*speed*this.direction ;
         this.strokePath.addPoint(new THREE.Vector3(this.p.x,this.p.y), thickness);
