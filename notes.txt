@@ -1,5 +1,15 @@
 todo
 
+
+load from a list of images
+clear the canvas
+
+
+target resolution:
+- 24in x 18in
+- 7200 x 5400 pixels
+
+
 add an alpha att
 test colour change - sample along the particle path and adjust colour?
 

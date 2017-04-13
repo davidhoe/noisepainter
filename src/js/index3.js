@@ -34,6 +34,11 @@ var fragshader;
 var vertshader;
 TextFileLoader.Instance().loadFiles(["shaders/fragShader.glsl","shaders/vertShader.glsl"], filesLoaded);
 
+
+var textureFilenames = ["7.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg"];
+var textureIX = 0;
+
+
 function filesLoaded(files)
 {
     fragshader = files[0];
@@ -127,7 +132,46 @@ function onDocumentKeyDown(event) {
       //  savePixels();
          saveCanvas();
     }
+    if(event.key == " ")
+    {
+        reset();
+    }
+
 }
+
+
+function reset()
+{
+    console.log("reset");
+    imageDataLoaded = false;
+
+    // clear
+    renderer.clear();
+
+    // choose a texture and load it
+    var loader = new THREE.TextureLoader();
+    loader.setPath('textures/');
+    textureIX = (textureIX + 1) % textureFilenames.length;
+    var imageURL =   textureFilenames[textureIX];
+//    var imageURL = 'grad.png';
+
+    var _this = this;
+    var texture = loader.load(imageURL,
+        function ( texture ) {
+            // do something with the texture on complete
+            console.log("texture", texture);
+            imagedata = getImageData(texture.image );
+            console.log("imagedata", imagedata);
+            imageDataLoaded = true;
+            //test();
+        }
+    );
+
+
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 function savePixels()
 {
