@@ -27,8 +27,8 @@ export class Particle
         this.v.x = fv.x;
         this.v.y = fv.y;
 
-        var speed = 5 + MathUtils.GetSeededRandomFloat(0,10) ;
-        speed /= 1;
+        var speed = 6 + MathUtils.GetSeededRandomFloat(0,0) ;
+        speed *= 1;
         this.p.x += this.v.x*speed*this.direction;
         this.p.y += this.v.y*speed*this.direction ;
         this.strokePath.addPoint(new THREE.Vector3(this.p.x,this.p.y), thickness);

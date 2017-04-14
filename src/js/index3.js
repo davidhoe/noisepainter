@@ -49,14 +49,14 @@ function filesLoaded(files)
 // if camera is cetnered, then it should be centered in x pos
 // if camera is not centered,
 
-var renderScale = 1;
-var zoom = 0.2 * renderScale ;
-var basezoom = 1; // change this to change the amount of turbulance
-var meshPositionY = 0/basezoom*zoom;
+var renderScale = 5.4;
+//var basezoom = 1; // change this to change the amount of turbulance
 
-var w = 1000 * renderScale;
-var h = 800 * renderScale;
-var bottomy = h * 1.0;
+var bw = 1000;
+var bh = bw*1.5;
+var w = bw * renderScale;
+var h = bh * renderScale;
+var bottomy = bh * 1.0;
 
 
 function init() {
@@ -359,7 +359,7 @@ function makeMeshObj()
     mesh.frustumCulled = false;
     //var zoom = 0.5;
   //  mesh.position.y = meshPositionY;
-  //  mesh.scale.set(zoom,zoom,zoom);
+    mesh.scale.set(renderScale,renderScale);
     scene.add( mesh );
 
 
@@ -392,7 +392,7 @@ function drawTest()
     var nx =  Math.random()*0.99 ;
     var ny = Math.random()*0.99 ;
     // convert to the emission bound
-    var canvasx = nx*w; // stretch the width
+    var canvasx = nx*bw; // stretch the width
     var canvasy = ny*bottomy; // do
 
     var col = getPixel(imagedata,nx,ny);
@@ -401,7 +401,7 @@ function drawTest()
     //var y =-450+ ny*950;
 
 
-    var thickness = 0.5 + Math.random()*7;
+    var thickness = 0.5 + Math.random()*3;
     var direction = (Math.random() < 0.5)?  -1 : 1;
     var nsteps = 30 + Math.random()*100;
     var alpha =  0.7 + 0.5*Math.random();
