@@ -158,12 +158,22 @@ function init() {
      document.body.appendChild( stats.domElement );
 */
     window.addEventListener( 'resize', onWindowResize, false );
+    renderer.domElement.addEventListener( 'mousemove', onMouseMove, true );
 
     createGui();
 
     reset();
 
 }
+
+function onMouseMove(event){
+    var mouseX = (event.clientX);
+    var mouseY = (event.clientY);
+
+    console.log(mouseX,mouseY);
+    //mouseY = (event.clientY - window.innerHeight/2) / window.innerHeight/2;
+}
+
 
 document.addEventListener('keydown',onDocumentKeyDown,false);
 function onDocumentKeyDown(event) {
