@@ -35,7 +35,11 @@ var vertshader;
 TextFileLoader.Instance().loadFiles(["shaders/fragShader.glsl","shaders/vertShader.glsl"], filesLoaded);
 
 
-var textureFilenames = ["7.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg"];
+var textureFilenames = [];
+for(var i=1;i<=41;++i)
+{
+    textureFilenames.push( "colourful" + "/" + ((i < 10) ?"0":"") + i + ".jpg");
+}
 var textureIX = 0;
 
 
@@ -49,17 +53,46 @@ function filesLoaded(files)
 // if camera is cetnered, then it should be centered in x pos
 // if camera is not centered,
 
-var renderScale = 5.4;
-//var basezoom = 1; // change this to change the amount of turbulance
 
-var bw = 1000;
-var bh = bw*1.5;
+var ExportMode = {
+    "png": "png",
+    "jpg": "jpg"
+};
+var exportMode = ExportMode.png;
+
+
+//var renderScale = 5.4;
+var renderScale,bw,bh,bottomy;
+
+var Mode = {
+    "skyline": "skyline",
+    "maps": "maps"
+};
+var mode = Mode.maps;
+
+renderScale = 7.2;
+
+if(mode == Mode.skyline)
+{
+    bw = 1000;
+    bh = bw*(3/4);
+    bottomy = bh *0.6;
+}
+else{
+    // "maps"
+  //  renderScale = 7.2;
+    bh = 1000;
+    bw = bh*(3/4);
+    bottomy = bh * 1.0;
+}
+
 var w = bw * renderScale;
 var h = bh * renderScale;
-var bottomy = bh * 1.0;
 
 
+var noiseOffsetX, noiseOffsetY ;
 function init() {
+    randomiseField();
 
     container = document.getElementById( 'container' );
 
@@ -112,7 +145,10 @@ function init() {
     renderer.autoClear = false;
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( w,h);
-    document.body.appendChild( renderer.domElement );
+
+   var div = document.getElementById("canvasContainer");
+    div.appendChild(renderer.domElement );
+    // document.body.appendChild( renderer.domElement );
     renderer.clear();
 
 /*
@@ -122,6 +158,11 @@ function init() {
      document.body.appendChild( stats.domElement );
 */
     window.addEventListener( 'resize', onWindowResize, false );
+
+    createGui();
+
+    reset();
+
 }
 
 document.addEventListener('keydown',onDocumentKeyDown,false);
@@ -134,12 +175,174 @@ function onDocumentKeyDown(event) {
     }
     if(event.key == " ")
     {
+        // next teuxtre
+        textureIX = (textureIX + 1) % textureFilenames.length;
+        reset();
+    }
+    if(event.key == "r")
+    {
+        randomiseField();
+        // refresh noise field
         reset();
     }
 
 }
+var gui;
+var originalPoints = [];
+for(var i = 0; i< 4;++i)
+{
+    originalPoints.push({"x":0, "y":0});
+}
+var points = originalPoints.slice(0);
+var rectModel = {
+    xOffset: 0.5,  //
+    yOffset: 0.5,
+    xScale: 1,
+    yScale: 1,
+    imageFilename: "image"
+};
+updatePoints(); // inital points should be a normalised rect
+console.log(points);
 
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// colour map sampling options
+
+function createGui()
+{
+     gui = new dat.GUI();
+
+    // My sample abject
+    var obj = {
+        flipX: function() {flipX();},
+        flipY: function() {flipY();},
+        rotate: function(){rotate();},
+        resetPoints: function(){resetPoints();}
+
+    };
+
+    // Number field with slider
+    gui.add(rectModel, "xOffset").min(0).max(1).step(0.01).onChange(function(val) {
+        //    console.log("changed " + val);
+            updatePoints();
+        }
+    ).listen();
+    gui.add(rectModel, "yOffset").min(0).max(1).step(0.01).onChange(function(val) {
+          //  console.log("changed " + val);
+            updatePoints();
+        }
+    ).listen();
+    gui.add(rectModel, "xScale").min(0).max(1).step(0.01).onChange(function(val) {
+           // console.log("changed " + val);
+            updatePoints();
+        }
+    ).listen();
+    gui.add(rectModel, "yScale").min(0).max(1).step(0.01).onChange(function(val) {
+            //console.log("changed " + val);
+            updatePoints();
+        }
+    ).listen();
+// Checkbox field
+    gui.add(obj, "flipX");
+    gui.add(obj, "flipY");
+    gui.add(obj, "rotate");
+    gui.add(obj, "resetPoints");
+    gui.add(rectModel, "imageFilename").listen();
+
+}
+
+function flipX()
+{
+    console.log("flip x");
+    var temp = points.slice(0);
+    points[0] = temp[1];
+    points[1] = temp[0];
+    points[2] = temp[3];
+    points[3] = temp[2];
+    console.log(points);
+}
+
+function flipY()
+{
+    console.log("flipY");
+    var temp = points.slice(0);
+    points[0] = temp[3];
+    points[1] = temp[2];
+    points[2] = temp[1];
+    points[3] = temp[0];
+    console.log(points);
+
+}
+
+function rotate()
+{
+    var temp = points.slice(0);
+    points[0] = temp[1];
+    points[1] = temp[2];
+    points[2] = temp[3];
+    points[3] = temp[0];
+    console.log(points);
+
+}
+
+function resetPoints()
+{
+    rectModel.xOffset =  0.5;
+    rectModel.yOffset =  0.5;
+    rectModel.xScale =  1;
+    rectModel.yScale =  1;
+
+    updatePoints();
+    points = originalPoints.slice(0);
+    console.log(points);
+}
+
+function updatePoints()
+{
+    var w = rectModel.xScale;
+    var h = rectModel.yScale;
+    var x = (rectModel.xOffset - 0.5)*(1-w) - 0.5*w +0.5;
+    var y = (rectModel.yOffset - 0.5)*(1-h) - 0.5*h + 0.5;
+
+    originalPoints[0].x = x;
+    originalPoints[0].y = y;
+    originalPoints[1].x = x + w;
+    originalPoints[1].y = y;
+    originalPoints[2].x = x + w;
+    originalPoints[2].y = y + h;
+    originalPoints[3].x = x ;
+    originalPoints[3].y = y + h;
+    console.log(originalPoints);
+
+}
+
+function getPoint(x,y)
+{
+    var p0 = points[0];
+    var p1 = points[1];
+    var p2 = points[2];
+    var p3 = points[3];
+
+    var x0 = p0.x + x*(p1.x - p0.x);
+    var y0 = p0.y + x*(p1.y - p0.y);
+    var x1 = p2.x + x*(p2.x - p3.x);
+    var y1 = p2.y + x*(p2.y - p3.y);
+
+    var tx = x0 + y*(x1- x0);
+    var ty = y0 + y*(y1- y0);
+    return {"y":ty,"x":tx};
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function randomiseField()
+{
+    noiseOffsetX = MathUtils.GetRandomFloat(0,100);
+    noiseOffsetY = MathUtils.GetRandomFloat(0,100);
+
+}
 function reset()
 {
     console.log("reset");
@@ -151,17 +354,19 @@ function reset()
     // choose a texture and load it
     var loader = new THREE.TextureLoader();
     loader.setPath('textures/');
-    textureIX = (textureIX + 1) % textureFilenames.length;
+
     var imageURL =   textureFilenames[textureIX];
 //    var imageURL = 'grad.png';
+    console.log("imageURL "+ imageURL);
+    rectModel.imageFilename = imageURL; // show filename for debugin
 
     var _this = this;
     var texture = loader.load(imageURL,
         function ( texture ) {
             // do something with the texture on complete
-            console.log("texture", texture);
+           // console.log("texture", texture);
             imagedata = getImageData(texture.image );
-            console.log("imagedata", imagedata);
+           // console.log("imagedata", imagedata);
             imageDataLoaded = true;
             //test();
         }
@@ -173,52 +378,21 @@ function reset()
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-function savePixels()
-{
-    var gl = renderer.domElement.getContext('webgl');
-    console.log(gl.drawingBufferWidth, gl.drawingBufferHeight);
-    var pixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4);
-    gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    console.log(pixels); // Uint8Array
-}
-
 function saveCanvas()
 {
-    renderer.domElement.toBlob(function(blob) {
-        saveAs(blob, "output.png");
-    });
-}
-
-function saveAsImage() {
-    var imgData, imgNode;
-    try {
-        var strDownloadMime = "image/octet-stream";
-
-        var strMime = "image/png";
-        imgData = renderer.domElement.toDataURL(strMime);
-
-        document.write("<img src='"+imgData+"' alt='from canvas'/>");
-
-        //saveFile(imgData.replace(strMime, strDownloadMime), "test.jpg");
-    } catch (e) {
-        console.log(e);
-        return;
+    if(exportMode == ExportMode.png) {
+         renderer.domElement.toBlob(function(blob) {
+         saveAs(blob, "output" + MathUtils.GenerateUUID() + ".png");
+         });
     }
+    else {
 
-}
-
-var saveFile = function (strData, filename) {
-    var link = document.createElement('a');
-    if (typeof link.download === 'string') {
-        document.body.appendChild(link); //Firefox requires the link to be in the body
-        link.download = filename;
-        link.href = strData;
-        link.click();
-        document.body.removeChild(link); //remove the link when done
-    } else {
-        location.replace(uri);
+        renderer.domElement.toBlob(function (blob) {
+            saveAs(blob, "output" + MathUtils.GenerateUUID() + ".jpg");
+        }, "image/jpeg");
     }
 }
+
 
 ////////////////////////////////////////////////
 
@@ -233,37 +407,41 @@ function getImageData( image ) {
 }
 
 function getPixel( imagedata, nx, ny ) {
-    var x = Math.round( nx *imagedata.width);
-    var y = Math.round( ny *imagedata.height);
+    var x = Math.floor( nx *(imagedata.width - 1));
+    var y = Math.floor( ny *(imagedata.height-1));
     var position = ( x + imagedata.width * y ) * 4, data = imagedata.data;
     return { r: data[ position ] /255.0, g: data[ position + 1 ]/255.0, b: data[ position + 2 ]/255.0, a: data[ position + 3 ]/255.0 };
 }
 
 var imagedata = null;
 var imageDataLoaded = false;
-var preloader = new Preloader();
-preloader.load(() => {
+//var preloader = new Preloader();
+
+
+//load();
+function load() {
+//preloader.load(() => {
 //    this.scene.add(this.cube);
     //this.render();
-   // var imgTexture = THREE.ImageUtils.loadTexture( "environment/floor.jpg" );
+    // var imgTexture = THREE.ImageUtils.loadTexture( "environment/floor.jpg" );
     var loader = new THREE.TextureLoader();
     loader.setPath('textures/');
-    var imageURL = '7.jpg';
+    var imageURL = '01.jpg';
 //    var imageURL = 'grad.png';
 
     var _this = this;
     var texture = loader.load(imageURL,
-        function ( texture ) {
+        function (texture) {
             // do something with the texture on complete
             console.log("texture", texture);
-            imagedata = getImageData(texture.image );
+            imagedata = getImageData(texture.image);
             console.log("imagedata", imagedata);
             imageDataLoaded = true;
             //test();
         }
     );
 
-});
+}
 
 var field = new VectorField();
 var p0s;
@@ -364,7 +542,7 @@ function makeMeshObj()
 
 
     //add a test horizon line
-    addTestLine();
+    //addTestLine();
 
     ready = true;
   //  drawTest();
@@ -385,6 +563,10 @@ function addTestLine()
     scene.add( line );
 }
 
+Math.clamp = function(number, min, max) {
+    return Math.max(min, Math.min(number, max));
+}
+
 function drawTest()
 {
     // todo use canvas coordinates
@@ -393,18 +575,28 @@ function drawTest()
     var ny = Math.random()*0.99 ;
     // convert to the emission bound
     var canvasx = nx*bw; // stretch the width
-    var canvasy = ny*bottomy; // do
+    var canvasy = bh - ny*( bottomy); // do
 
-    var col = getPixel(imagedata,nx,ny);
+    //get slight random position
+    var randomColPositionAmount= 0.01;
+    var colx = Math.clamp( MathUtils.GetRandomFloat(nx- randomColPositionAmount,nx + randomColPositionAmount) ,0,0.999);
+    var coly = Math.clamp( MathUtils.GetRandomFloat(ny- randomColPositionAmount,ny + randomColPositionAmount) ,0,0.999);
+    var transformedPoint = getPoint(colx,coly);
+    colx = transformedPoint.x;
+    coly = transformedPoint.y;
+
+    var col = getPixel(imagedata, colx,coly);
+
+
 
     //var x =-1000+ nx*2000;
     //var y =-450+ ny*950;
 
 
-    var thickness = 0.5 + Math.random()*3;
+    var thickness = 0.5 + Math.random()*1.5;
     var direction = (Math.random() < 0.5)?  -1 : 1;
     var nsteps = 30 + Math.random()*100;
-    var alpha =  0.7 + 0.5*Math.random();
+    var alpha =  0.3 + 0.7*Math.random();
     var particle;
 
     // set a random seed
@@ -414,8 +606,12 @@ function drawTest()
     var brightness = 0.5;
     MathUtils.SetSeed(seed); // rset seed
     particle = new Particle(field);
+
     var thicknessShade = Math.min( thickness  + 4, thickness  *1.2);
     particle.init( canvasx,canvasy, thicknessShade, direction);
+    particle.noiseOffsetX = noiseOffsetX;
+    particle.noiseOffsetY = noiseOffsetY;
+
     particle.strokePath.colour = new THREE.Vector3(col.r*brightness,col.g*brightness,col.b*brightness);
     particle.strokePath.alpha = alpha*0.2;
     for(var i =0; i< nsteps;++i)
@@ -430,6 +626,8 @@ function drawTest()
     MathUtils.SetSeed(seed); // rset seed
     particle = new Particle(field);
     particle.init(canvasx,canvasy, thickness, direction);
+    particle.noiseOffsetX = noiseOffsetX;
+    particle.noiseOffsetY = noiseOffsetY;
     particle.strokePath.colour = new THREE.Vector3(col.r,col.g,col.b);
     particle.strokePath.alpha =alpha;
     for(var i =0; i< nsteps;++i)

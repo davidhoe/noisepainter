@@ -38,7 +38,7 @@ export class StrokePath
             // noise function?
             var frequency = 0.1; // higher the more the compressed wave effect
             var thicknessScale = noise.perlin2(i * frequency, ranNoiseY );
-            var thickness = this.thicknesses[i]/2 * (1 + thicknessScale*1.5);
+            var thickness = this.thicknesses[i]/2 * (1 + thicknessScale*1.0);
 
             var c0 = this.points[Math.max(0,i - 1)];
             var c1 = this.points[i ];
@@ -65,7 +65,7 @@ export class StrokePath
         for(var i =0; i< n-2;++i)
         {
             // vary the segment alpha
-            var segmentAlpha = this.alpha* MathUtils.GetRandomFloat(0.7,1);
+            var segmentAlpha = this.alpha* MathUtils.GetRandomFloat(0.9,1);
 
 
             //col.x = Math.random();

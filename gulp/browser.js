@@ -17,8 +17,11 @@ console.log("this os is: " + this_os);
  os.platform() === 'win32' ? 'chrome' : 'firefox'));
  */
 
+var browser  = 'firefox';
+
+
 // open in default browser
 gulp.task('browser', function(){
     gulp.src(__filename)
-        .pipe(open({uri: 'http://localhost:8080'}));
+        .pipe(open({app: browser, uri: 'http://localhost:8080'}));
 });
