@@ -70,7 +70,8 @@ var Mode = {
 };
 var mode = Mode.maps;
 
-renderScale = 7.2;
+//renderScale = 7.2;
+renderScale = 1.0;
 
 if(mode == Mode.skyline)
 {
@@ -159,20 +160,20 @@ function init() {
 */
     window.addEventListener( 'resize', onWindowResize, false );
     renderer.domElement.addEventListener( 'mousemove', onMouseMove, true );
+    renderer.domElement.addEventListener( 'mousedown', onMouseDown, true );
+    renderer.domElement.addEventListener( 'mouseup', onMouseUp, true );
+
 
     createGui();
 
     reset();
 
 }
+var ismousedown =false;
+var mousex = 0;
+var mousey = 0;
 
-function onMouseMove(event){
-    var mouseX = (event.clientX);
-    var mouseY = (event.clientY);
 
-    console.log(mouseX,mouseY);
-    //mouseY = (event.clientY - window.innerHeight/2) / window.innerHeight/2;
-}
 
 
 document.addEventListener('keydown',onDocumentKeyDown,false);
@@ -218,6 +219,10 @@ console.log(points);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // colour map sampling options
+var particleOptions = {
+    directionForward: true
+
+}
 
 function createGui()
 {
@@ -259,6 +264,7 @@ function createGui()
     gui.add(obj, "rotate");
     gui.add(obj, "resetPoints");
     gui.add(rectModel, "imageFilename").listen();
+    gui.add(particleOptions, "directionForward").listen();
 
 }
 
@@ -555,7 +561,7 @@ function makeMeshObj()
     //addTestLine();
 
     ready = true;
-  //  drawTest();
+  //  drawParticle();
 }
 
 
@@ -577,12 +583,65 @@ Math.clamp = function(number, min, max) {
     return Math.max(min, Math.min(number, max));
 }
 
-function drawTest()
+function onMouseMove(event){
+    mousex = (event.clientX);
+    mousey = (event.clientY);
+
+    console.log(mousex,mousey);
+    //mouseY = (event.clientY - window.innerHeight/2) / window.innerHeight/2;
+}
+
+
+function onMouseUp(event){
+    ismousedown = false;
+    console.log("onMouseUp");
+}
+
+function onMouseDown(event){
+    ismousedown = true;
+    console.log("onMouseDown");
+    nsteps = 20 + Math.random()*160;
+}
+var nsteps = 20;
+
+function drawParticleUpdate()
+{
+    if(ismousedown)
+    {
+        var n = 50;
+        var nx = mousex/w +  Math.random()*0.02 ;
+        var ny = mousey/h +  Math.random()*0.02 ;
+        console.log(mousex/w, mousex/h);
+        var direction =  particleOptions.directionForward ? 1: -1;// (Math.random() < 0.5)?  -1 : 1;
+        var thickness = 0.5 + Math.random()*1.5;
+         var alpha =  0.3 + 0.7*Math.random();
+
+        for (var i = 0; i < n; ++i) {
+            drawParticle(nx,ny, direction, nsteps, thickness, alpha);
+        }
+    }
+
+    //drawRandomParticles(400);
+}
+
+function drawRandomParticles(n)
+{
+    for (var i = 0; i < n; ++i) {
+        // particles are nomralised [0,1] -> remap to [-h,h]
+        var nx =  Math.random()*0.99 ;
+        var ny = Math.random()*0.99 ;
+        var direction = (Math.random() < 0.5)?  -1 : 1;
+        var thickness = 0.5 + Math.random()*1.5;
+        var nsteps = 30 + Math.random()*100;
+        var alpha =  0.3 + 0.7*Math.random();
+        drawParticle(nx,ny, direction, nsteps, thickness, alpha);
+    }
+}
+
+// draw particle at nx,ny
+function drawParticle(nx,ny, direction, nsteps, thickness, alpha)
 {
     // todo use canvas coordinates
-    // particles are nomralised [0,1] -> remap to [-h,h]
-    var nx =  Math.random()*0.99 ;
-    var ny = Math.random()*0.99 ;
     // convert to the emission bound
     var canvasx = nx*bw; // stretch the width
     var canvasy = bh - ny*( bottomy); // do
@@ -597,16 +656,10 @@ function drawTest()
 
     var col = getPixel(imagedata, colx,coly);
 
-
-
     //var x =-1000+ nx*2000;
     //var y =-450+ ny*950;
 
 
-    var thickness = 0.5 + Math.random()*1.5;
-    var direction = (Math.random() < 0.5)?  -1 : 1;
-    var nsteps = 30 + Math.random()*100;
-    var alpha =  0.3 + 0.7*Math.random();
     var particle;
 
     // set a random seed
@@ -684,9 +737,7 @@ function animate() {
         bufferix = 0;
        // console.log("imageDataLoaded", imageDataLoaded);
 
-        for (var i = 0; i < 500; ++i) {
-            drawTest();
-        }
+        drawParticleUpdate();
         grid.setDrawCount(bufferix);
         //console.log(bufferix);
         // update
